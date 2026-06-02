@@ -20,12 +20,25 @@ void Game::Reset()
 	ResetBall();
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
-	brick.width = 10;
-	brick.height = 2;
-	brick.x_position = 0;
-	brick.y_position = 5;
-	brick.doubleThick = true;
-	brick.color = ConsoleColor::DarkGreen;
+
+	bricks.clear();
+
+	//Made this 8 so it filled the screen better
+	for (int i = 0; i < 8; i++) {
+		Box tempBrick;
+
+		tempBrick.width = 10;
+		tempBrick.height = 2;
+		tempBrick.x_position = i*10;
+		tempBrick.y_position = 5;
+		tempBrick.doubleThick = true;
+		tempBrick.color = ConsoleColor::DarkCyan; 
+
+		bricks.push_back(tempBrick);
+	}
+
+	won = false;
+	lost = false;
 }
 
 void Game::ResetBall()
@@ -69,7 +82,23 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	brick.Draw();
+
+	for (const Box& brick : bricks) {
+		brick.Draw();
+	}
+
+	if (won) {
+		Console::SetCursorPosition(Console::WindowWidth() / 4, Console::WindowHeight() / 2);
+		Console::ForegroundColor(Green);
+
+		std::cout << "YOU WIN!!!\tPress 'R' to play again";
+	}
+	else if (lost) {
+		Console::SetCursorPosition(Console::WindowWidth() / 4, Console::WindowHeight() / 2);
+		Console::ForegroundColor(Red);
+
+		std::cout << "You lost :(\tPress 'R' to restart";
+	}
 
 	Console::Lock(false);
 }
@@ -77,17 +106,31 @@ void Game::Render() const
 void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
-	if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
-	{
-		brick.color = ConsoleColor(brick.color - 1);
-		ball.y_velocity *= -1;
 
-		// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+	for (int i = 0; i < bricks.size();) {
 
+		Box& brick = bricks[i];
+
+		if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
+		{
+			brick.color = ConsoleColor(brick.color - 1);
+			ball.y_velocity *= -1;
+
+			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
+		}
+		if (brick.color == Black) {
+			bricks.erase(bricks.begin() + i);
+		}
+		else {
+			i++;
+		}
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
-
+	if (bricks.empty()) {
+		ball.moving = false;
+		won = true;
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
@@ -95,4 +138,10 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	//I dont know the bottom of the window but I do know where the paddle is
+	if (ball.y_position > paddle.y_position + 5) {
+		ball.moving = false;
+		lost = true;
+	}
 }
