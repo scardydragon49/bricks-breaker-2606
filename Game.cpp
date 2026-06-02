@@ -21,7 +21,10 @@ void Game::Reset()
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
 
-	for (int i = 0; i < 2; i++) {
+	bricks.clear();
+
+	//Made this 8 so it filled the screen better
+	for (int i = 0; i < 8; i++) {
 		Box tempBrick;
 
 		tempBrick.width = 10;
@@ -29,7 +32,7 @@ void Game::Reset()
 		tempBrick.x_position = i*10;
 		tempBrick.y_position = 5;
 		tempBrick.doubleThick = true;
-		tempBrick.color = ConsoleColor::DarkBlue; 
+		tempBrick.color = ConsoleColor::DarkCyan; 
 
 		bricks.push_back(tempBrick);
 	}
@@ -88,7 +91,7 @@ void Game::Render() const
 		Console::SetCursorPosition(Console::WindowWidth() / 4, Console::WindowHeight() / 2);
 		Console::ForegroundColor(Green);
 
-		std::cout << "YOU WIN!!!\tPress 'R' to restart";
+		std::cout << "YOU WIN!!!\tPress 'R' to play again";
 	}
 	else if (lost) {
 		Console::SetCursorPosition(Console::WindowWidth() / 4, Console::WindowHeight() / 2);
@@ -104,16 +107,7 @@ void Game::CheckCollision()
 {
 	// TODO #4 - Update collision to check all bricks
 
-	/*
-	I know its for an assaignment and all but
-	wouldnt doing collision checks with the ball be better
-
-	I thought about it and realised "How would the ball know if it where at a brick"
-	I was thinking about this like this program had collision like a game engine
-	I dont think it does, so doing it through the bricks doesnt really matter
-	*/
-
-	for (int i = 0; i < bricks.size(); i++) {
+	for (int i = 0; i < bricks.size();) {
 
 		Box& brick = bricks[i];
 
@@ -123,10 +117,12 @@ void Game::CheckCollision()
 			ball.y_velocity *= -1;
 
 			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
-
-			if (brick.color == Black) {
-				bricks.erase(bricks.begin() + i);
-			}
+		}
+		if (brick.color == Black) {
+			bricks.erase(bricks.begin() + i);
+		}
+		else {
+			i++;
 		}
 	}
 
