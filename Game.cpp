@@ -21,7 +21,7 @@ void Game::Reset()
 
 	// TODO #2 - Add this brick and 4 more bricks to the vector
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 2; i++) {
 		Box tempBrick;
 
 		tempBrick.width = 10;
@@ -29,16 +29,13 @@ void Game::Reset()
 		tempBrick.x_position = i*10;
 		tempBrick.y_position = 5;
 		tempBrick.doubleThick = true;
-		/*
-		//Changed so bricks take 3 hits instead of two.
-		This is because the intructions say
-		"Collision Response - If a brick is hit by the ball 3 times, remove it from the vector."
-		it feels wrong for it to go away in two hits
-		*/
-		tempBrick.color = ConsoleColor::DarkCyan; 
+		tempBrick.color = ConsoleColor::DarkBlue; 
 
 		bricks.push_back(tempBrick);
-	}	
+	}
+
+	won = false;
+	lost = false;
 }
 
 void Game::ResetBall()
@@ -87,6 +84,19 @@ void Game::Render() const
 		brick.Draw();
 	}
 
+	if (won) {
+		Console::SetCursorPosition(Console::WindowWidth() / 4, Console::WindowHeight() / 2);
+		Console::ForegroundColor(Green);
+
+		std::cout << "YOU WIN!!!\tPress 'R' to restart";
+	}
+	else if (lost) {
+		Console::SetCursorPosition(Console::WindowWidth() / 4, Console::WindowHeight() / 2);
+		Console::ForegroundColor(Red);
+
+		std::cout << "You lost :(\tPress 'R' to restart";
+	}
+
 	Console::Lock(false);
 }
 
@@ -123,7 +133,7 @@ void Game::CheckCollision()
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
 	if (bricks.empty()) {
 		ball.moving = false;
-
+		won = true;
 	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
@@ -132,4 +142,10 @@ void Game::CheckCollision()
 	}
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
+
+	//I dont know the bottom of the window but I do know where the paddle is
+	if (ball.y_position > paddle.y_position + 5) {
+		ball.moving = false;
+		lost = true;
+	}
 }
