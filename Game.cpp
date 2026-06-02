@@ -29,7 +29,13 @@ void Game::Reset()
 		tempBrick.x_position = i*10;
 		tempBrick.y_position = 5;
 		tempBrick.doubleThick = true;
-		tempBrick.color = ConsoleColor::DarkGreen;
+		/*
+		//Changed so bricks take 3 hits instead of two.
+		This is because the intructions say
+		"Collision Response - If a brick is hit by the ball 3 times, remove it from the vector."
+		it feels wrong for it to go away in two hits
+		*/
+		tempBrick.color = ConsoleColor::DarkCyan; 
 
 		bricks.push_back(tempBrick);
 	}	
@@ -76,6 +82,7 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
+
 	for (const Box& brick : bricks) {
 		brick.Draw();
 	}
@@ -90,8 +97,16 @@ void Game::CheckCollision()
 	/*
 	I know its for an assaignment and all but
 	wouldnt doing collision checks with the ball be better
+
+	I thought about it and realised "How would the ball know if it where at a brick"
+	I was thinking about this like this program had collision like a game engine
+	I dont think it does, so doing it through the bricks doesnt really matter
 	*/
-	for (Box& brick : bricks) {
+
+	for (int i = 0; i < bricks.size(); i++) {
+
+		Box& brick = bricks[i];
+
 		if (brick.Contains(ball.x_position + ball.x_velocity, ball.y_position + ball.y_velocity))
 		{
 			brick.color = ConsoleColor(brick.color - 1);
@@ -99,11 +114,17 @@ void Game::CheckCollision()
 
 			// TODO #5 - If the ball hits the same brick 3 times (color == black), remove it from the vector
 
+			if (brick.color == Black) {
+				bricks.erase(bricks.begin() + i);
+			}
 		}
 	}
 
 	// TODO #6 - If no bricks remain, pause ball and display (render) victory text with R to reset
+	if (bricks.empty()) {
+		ball.moving = false;
 
+	}
 
 	if (paddle.Contains(ball.x_position + ball.x_velocity, ball.y_velocity + ball.y_position))
 	{
