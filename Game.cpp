@@ -76,7 +76,7 @@ void Game::Render() const
 	ball.Draw();
 
 	// TODO #3 - Update render to render all bricks
-	for (Box brick : bricks) {
+	for (const Box& brick : bricks) {
 		brick.Draw();
 	}
 
