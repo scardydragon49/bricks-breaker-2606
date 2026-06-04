@@ -139,7 +139,6 @@ void Game::CheckCollision()
 
 	// TODO #7 - If ball touches bottom of window, pause ball and display (render) defeat text with R to reset
 
-	//I dont know the bottom of the window but I do know where the paddle is
 	if (ball.y_position > paddle.y_position + 5) {
 		ball.moving = false;
 		lost = true;
